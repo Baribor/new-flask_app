@@ -1,18 +1,21 @@
-
+import os
 from flask import Flask, render_template, request, redirect
 from pymongo import MongoClient
+from dotenv import load_dotenv
+load_dotenv()
 
-app = Flask(__name__, template_folder='template')
+app = Flask(__name__, template_folder='templates')
 
 # Connecting to MongoDB
-client = MongoClient('mongodb://localhost:27017')
+mongo_connection_string = os.getenv('MONGO_CONNECTION_STRING')
+client = MongoClient(mongo_connection_string)
 db = client['SurveyDatabase']
 collection = db['Users']
 
 @app.route('/', methods=['GET', 'POST'])
 def survey():
     if request.method == 'POST':
-        age = int(request.form.get('Age',0))
+        age = int(request.form.get('Age', 0))
         gender = request.form.get('gender', 'Not Specified')
         income = float(request.form.get('income'))
 
@@ -22,7 +25,6 @@ def survey():
             value = request.form.get(cat)
             if value:
                 expenses[cat] = float(value)
-            
 
         user_data = {
             'Age': age,
@@ -42,10 +44,6 @@ def success():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
-    
-
-
 
 
 
